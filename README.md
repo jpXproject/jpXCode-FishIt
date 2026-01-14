@@ -11,4 +11,4 @@ No Lynxx • No obsolete remotes
 
 ## Load
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/USERNAME/jpXCode-FishIt/main/main.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/jpXproject/jpXCode-FishIt/refs/heads/main/main.lua"))()
