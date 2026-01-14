@@ -1,32 +1,40 @@
--- jpXCode Fish It Loader (STABLE)
+-- =====================================
+-- jpXCode CLEAN-UP SYSTEM
+-- =====================================
 
-local BASE_URL = "https://raw.githubusercontent.com/jpXproject/jpXCode-FishIt/main/"
-
-local function Load(path)
-    local ok, result = pcall(function()
-        return game:HttpGet(BASE_URL .. path)
-    end)
-
-    if not ok or not result or result == "" then
-        warn("[jpXCode] HttpGet FAILED:", path)
-        return nil
+pcall(function()
+    -- 1. Matikan loop / thread lama
+    if _G.jpXCore and _G.jpXCore._connections then
+        for _, conn in pairs(_G.jpXCore._connections) do
+            if typeof(conn) == "RBXScriptConnection" then
+                conn:Disconnect()
+            end
+        end
     end
 
-    local fn, err = loadstring(result)
-    if not fn then
-        warn("[jpXCode] Loadstring error:", err)
-        return nil
+    -- 2. Hancurkan UI lama
+    local pg = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
+    if pg then
+        for _, gui in ipairs(pg:GetChildren()) do
+            if gui.Name:find("jpX") or gui.Name:find("FishIt") then
+                gui:Destroy()
+            end
+        end
     end
 
-    return fn()
-end
+    -- 3. Hancurkan CoreGui (kalau executor inject di sana)
+    local cg = game:GetService("CoreGui")
+    for _, gui in ipairs(cg:GetChildren()) do
+        if gui.Name:find("jpX") then
+            gui:Destroy()
+        end
+    end
 
-_G.jpXCore = {}
+    -- 4. Reset global state
+    _G.jpXCore = nil
+    _G.jpXLoaded = nil
 
-_G.jpXCore.GPS      = Load("core/gps.lua")
-_G.jpXCore.Detector = Load("core/detector.lua")
-_G.jpXCore.Fishing  = Load("core/fishing.lua")
+    print("[jpXCode] Previous script cleaned")
+end)
 
-Load("ui/hub.lua")
-
-print("✅ jpXCode FishIt loaded")
+task.wait(0.2)
